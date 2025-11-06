@@ -1,0 +1,24 @@
+name: GamBling
+version: '1.0-SNAPSHOT'
+main: pl.edu.cwel.gamBling.GamBling
+api-version: '1.21'
+website: cwel.edu.pl
+
+
+commands:
+  opencase:
+    description: opens a test case
+    aliases: case
+    usage: /opencase
+  roulette:
+    description: plays a test round of roulette
+    aliases: roll
+    usage: /roulette
+  slots:
+    description: plays a test round of slots
+    aliases: 777
+    usage: /slots
+  blackjack:
+    description: plays a test game of blackjack
+    aliases: bj
+    usage: /blackjack
