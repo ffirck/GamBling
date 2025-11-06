@@ -31,6 +31,7 @@ public final class GamBling extends JavaPlugin implements Listener {
         // Plugin shutdown logic
     }
 
+    // https://www.geeksforgeeks.org/java/java-program-to-capitalize-the-first-letter-of-each-word-in-a-string/ - tutorial credit!!
     public static String getNameFromKey(String translationKey){
         String isolatedName = translationKey
                 .replace("_", " ")
