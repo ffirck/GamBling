@@ -23,6 +23,9 @@ public class RoulettePlayListener implements Listener {
     private GamBling main;
     private final Inventory inv;
 
+    ItemStack bet = itemStack(Material.BARRIER, "Placeholder");
+    ItemStack betItem = itemStack(Material.BARRIER, "Placeholder");
+
     public RoulettePlayListener(GamBling main){
         inv = Bukkit.createInventory(null, 54, "Rolling...");
         initializeItems();
@@ -71,53 +74,65 @@ public class RoulettePlayListener implements Listener {
 
         }
 
-        if (e.getView().getTitle().equals("Roulette") && e.getSlot() == 22 && e.getView().getItem(20).getType() != Material.AIR) {
-
-            p.openInventory(inv);
-            initializeItems();
-
-            int shiftAmount = new Random().nextInt(40,67);
-
-            Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
-                    Results(p), (shiftAmount*shiftAmount/10+40));
-
-            for(int i = 0; i < shiftAmount; i++) {
-                Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
-
-                    ItemStack tempItem = inv.getItem(53);
-
-                    for (int slot = 53; slot >= 0; slot--){
-
-                        if((slot % 9 == 0) && slot != 0){
-                            inv.setItem(slot, inv.getItem(slot - 9));
-                        }
-                        if(slot > 45){
-                            inv.setItem(slot, inv.getItem(slot - 1));
-                        }
-
-                    }
-                    for (int slot = 0; slot < 54; slot++){
-
-                        if(slot < 8){
-                            inv.setItem(slot, inv.getItem(slot + 1));
-                        }
-                        if(((slot + 1) % 9 == 0) && slot != 53){
-                            inv.setItem(slot, inv.getItem(slot + 9));
-                        }
-
-                    }
-
-                    inv.setItem(44, tempItem);
-
-                }, (i * i / 10));
-            }
-
+        if ((e.getView().getTitle().equals("Roulette") && e.getSlot() == 22 && Objects.requireNonNull(e.getView().getItem(20)).getType() != Material.AIR)) {
+            Play(p);
         }
 
-        if(e.getView().getTitle().contains("! - Roulette") && Objects.requireNonNull(e.getView().getItem(40)).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40){
+        if(e.getView().getTitle().contains("! - Roulette") && Objects.requireNonNull(e.getView().getItem(39)).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 39){
             p.performCommand("roulette");
         }
 
+        //play again same bet
+        if(e.getView().getTitle().contains("! - Roulette") && Objects.requireNonNull(e.getView().getItem(41)).getType() == Material.MUSIC_DISC_CHIRP && e.getSlot() == 41
+                && bet != null && p.getInventory().contains(bet)){
+            p.getInventory().removeItem(bet);
+            Play(p);
+        }
+
+    }
+
+    public void Play(Player p){
+        bet = betInv.getItem(20);
+        betItem = betInv.getItem(24);
+
+        p.openInventory(inv);
+        initializeItems();
+
+        int shiftAmount = new Random().nextInt(40,67);
+
+        Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
+                Results(p), (shiftAmount*shiftAmount/10+40));
+
+        for(int i = 0; i < shiftAmount; i++) {
+            Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> {
+
+                ItemStack tempItem = inv.getItem(53);
+
+                for (int slot = 53; slot >= 0; slot--){
+
+                    if((slot % 9 == 0) && slot != 0){
+                        inv.setItem(slot, inv.getItem(slot - 9));
+                    }
+                    if(slot > 45){
+                        inv.setItem(slot, inv.getItem(slot - 1));
+                    }
+
+                }
+                for (int slot = 0; slot < 54; slot++){
+
+                    if(slot < 8){
+                        inv.setItem(slot, inv.getItem(slot + 1));
+                    }
+                    if(((slot + 1) % 9 == 0) && slot != 53){
+                        inv.setItem(slot, inv.getItem(slot + 9));
+                    }
+
+                }
+
+                inv.setItem(44, tempItem);
+
+            }, (i * i / 10));
+        }
     }
 
     public void Results(Player p){
@@ -126,28 +141,24 @@ public class RoulettePlayListener implements Listener {
         ItemMeta resultMeta = bet.getItemMeta();
 
         Inventory res;
+
+        boolean won = false;
         res = Bukkit.createInventory(null, 45, "You lost! - Roulette");
 
-        if((betInv.getItem(24).getItemMeta().getDisplayName().contains("§8§lBLACK") && inv.getItem(49).getType() == Material.BLACK_CONCRETE)
-            || (betInv.getItem(24).getItemMeta().getDisplayName().contains("§4§lRED") && inv.getItem(49).getType() == Material.RED_CONCRETE)) {
+        if((betItem.getItemMeta().getDisplayName().contains("§8§lBLACK") && inv.getItem(49).getType() == Material.BLACK_CONCRETE)
+            || (betItem.getItemMeta().getDisplayName().contains("§4§lRED") && inv.getItem(49).getType() == Material.RED_CONCRETE)) {
             p.getInventory().addItem(bet);
             p.getInventory().addItem(bet);
             int amt = 2 * bet.getAmount();
 
-            if(inv.getItem(49).getAmount() == betInv.getItem(24).getAmount()) {
-                for(int i = 0; i < 18; i++){
-                    p.getInventory().addItem(bet);
-                }
-                amt = 20 * bet.getAmount();
-            }
-
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
             p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
 
+            won = true;
             res = Bukkit.createInventory(null, 45, "You won! - Roulette");
 
-        } else if (inv.getItem(49).getAmount() == betInv.getItem(24).getAmount() && betInv.getItem(24).getType() != Material.GREEN_CONCRETE) {
-            for(int i = 0; i < 20; i++){
+        } else if (inv.getItem(49).getAmount() == betItem.getAmount() && betItem.getType() != Material.GREEN_CONCRETE && inv.getItem(49).getType() != Material.GREEN_CONCRETE) {
+            for (int i = 0; i < 20; i++) {
                 p.getInventory().addItem(bet);
             }
             int amt = 20 * bet.getAmount();
@@ -155,8 +166,10 @@ public class RoulettePlayListener implements Listener {
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
             p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
 
+            won = true;
             res = Bukkit.createInventory(null, 45, "You won! - Roulette");
-        } else if (inv.getItem(49).getType() == Material.GREEN_CONCRETE && inv.getItem(24).getType() == Material.GREEN_CONCRETE) {
+        }
+        if (inv.getItem(49).getType() == Material.GREEN_CONCRETE && inv.getItem(24).getType() == Material.GREEN_CONCRETE) {
             for(int i = 0; i < 10; i++){
                 p.getInventory().addItem(bet);
             }
@@ -165,8 +178,10 @@ public class RoulettePlayListener implements Listener {
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
             p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
 
+            won = true;
             res = Bukkit.createInventory(null, 45, "You won! - Roulette");
-        } else {
+        }
+        if (!won) {
             p.sendMessage("§c§lLOSS! §rYou lost " + bet.getAmount() + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
         }
 
@@ -192,11 +207,14 @@ public class RoulettePlayListener implements Listener {
         res.setItem(22, inv.getItem(49));
         res.getItem(22).setItemMeta(resultMeta);
 
-        res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
+        res.setItem(39, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
+        res.setItem(41, itemStack(Material.MUSIC_DISC_CHIRP, "§c§kM §r§c§l→ PLAY AGAIN (SAME BET) ← §r§c§kM"));
 
         p.openInventory(res);
     }
 
+
+                                                    // ADD NAMING
     public void initializeItems(){
         for(int i = 0; i < 54; i++){
 

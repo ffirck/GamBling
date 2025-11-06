@@ -310,7 +310,7 @@ public class BlackjackListener implements Listener {
         res.setItem(22, result);
 
         res.setItem(39, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
-        res.setItem(41, itemStack(Material.MUSIC_DISC_CHIRP, "§a§kM §r§a§l→ PLAY AGAIN (SAME BET) ← §r§a§kM"));
+        res.setItem(41, itemStack(Material.MUSIC_DISC_CHIRP, "§c§kM §r§c§l→ PLAY AGAIN (SAME BET) ← §r§c§kM"));
 
         p.openInventory(res);
 
