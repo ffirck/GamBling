@@ -30,4 +30,25 @@ public final class GamBling extends JavaPlugin implements Listener {
     public void onDisable() {
         // Plugin shutdown logic
     }
+
+    public static String getNameFromKey(String translationKey){
+        String isolatedName = translationKey
+                .replace("_", " ")
+                .replace(".", "")
+                .replace("minecraft", "")
+                .replace("item", "")
+                .replace("block", "");
+
+        String[] words = isolatedName.split("\\s");
+        StringBuilder name = new StringBuilder();
+        for(String word : words){
+            name
+                    .append(Character.toTitleCase(word.charAt(0)))
+                    .append(word.substring(1))
+                    .append(" ");
+        }
+
+        return name.toString().trim();
+    }
+
 }

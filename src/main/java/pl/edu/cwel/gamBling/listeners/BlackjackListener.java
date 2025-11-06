@@ -17,6 +17,7 @@ import pl.edu.cwel.gamBling.GamBling;
 
 import java.util.*;
 
+import static pl.edu.cwel.gamBling.GamBling.getNameFromKey;
 import static pl.edu.cwel.gamBling.commands.Blackjack.bjBetInv;
 
 public class BlackjackListener implements Listener {
@@ -38,6 +39,8 @@ public class BlackjackListener implements Listener {
 
     public List<ItemStack> deck = Deck();
 
+    ItemStack bet = itemStack(Material.BARRIER, "Placeholder");
+
     @EventHandler
     public void OnClick(InventoryClickEvent e){
         Player p = (Player) e.getWhoClicked();
@@ -51,6 +54,8 @@ public class BlackjackListener implements Listener {
 
         if(e.getView().getTitle().equals("Blackjack - Bet") && Objects.requireNonNull(e.getView().getItem(22)).getType() == Material.DIAMOND_SWORD && e.getSlot() == 22
                 && Objects.requireNonNull(e.getView().getItem(20)).getType() != Material.AIR){
+            bet = bjBetInv.getItem(20);
+
             Collections.shuffle(deck);
             InitializeItems();
             p.openInventory(inv);
@@ -88,8 +93,21 @@ public class BlackjackListener implements Listener {
         }
 
         //play again
-        if(e.getView().getTitle().contains("! - Blackjack") && Objects.requireNonNull(e.getView().getItem(40)).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40){
+        if(e.getView().getTitle().contains("! - Blackjack") && Objects.requireNonNull(e.getView().getItem(39)).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 39){
             p.performCommand("blackjack");
+        }
+
+        //play again same bet
+        if(e.getView().getTitle().contains("! - Blackjack") && Objects.requireNonNull(e.getView().getItem(41)).getType() == Material.MUSIC_DISC_CHIRP && e.getSlot() == 41){
+
+            if(bet != null && p.getInventory().contains(bet)){
+                p.getInventory().removeItem(bet);
+
+                Collections.shuffle(deck);
+                InitializeItems();
+                p.openInventory(inv);
+            }
+
         }
 
     }
@@ -242,17 +260,18 @@ public class BlackjackListener implements Listener {
         Inventory res;
         res = Bukkit.createInventory(null, 45, "You lost! - Blackjack");
 
-        ItemStack bet = bjBetInv.getItem(20);
-        ItemMeta resultMeta = bet.getItemMeta();
+        ItemStack result = itemStack(bet.getType(), "§r§cYou lost!");
+        ItemMeta resultMeta = result.getItemMeta();
 
-        resultMeta.setDisplayName("§r§cYou lost!");
+        String resultName = getNameFromKey(result.getTranslationKey());
 
         if(scoreResult == dealerScoreResult){
             res = Bukkit.createInventory(null, 45, "You drew! - Blackjack");
 
+            p.sendMessage("§b§lDRAW! §rYou got returned: " + bet.getAmount() + "§7x §r§b" + resultName + "§r!");
             p.getInventory().addItem(bet);
 
-            resultMeta.setDisplayName("§r§lYou got returned: §r§7" + bet.getAmount() + "§8x §r§7" + bet.getType());
+            resultMeta.setDisplayName("§r§lYou got returned §r§7" + bet.getAmount() + "§8x §r§7" + resultName);
 
         } else if(scoreResult == 21 || dealerScoreResult > 21 || (scoreResult > dealerScoreResult && scoreResult <= 21)){
             res = Bukkit.createInventory(null, 45, "You won! - Blackjack");
@@ -262,7 +281,10 @@ public class BlackjackListener implements Listener {
 
             int amt = 2 * bet.getAmount();
 
-            resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
+            resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + resultName);
+            p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + resultName + "§r!");
+        } else {
+            p.sendMessage("§c§lLOSS! §rYou lost " + bet.getAmount() + "§7x §r§b" + resultName + "§r!");
         }
 
         for(int i = 0; i < 45; i++){
@@ -284,10 +306,11 @@ public class BlackjackListener implements Listener {
             res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
-        bet.setItemMeta(resultMeta);
-        res.setItem(22, bet);
+        result.setItemMeta(resultMeta);
+        res.setItem(22, result);
 
-        res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
+        res.setItem(39, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
+        res.setItem(41, itemStack(Material.MUSIC_DISC_CHIRP, "§a§kM §r§a§l→ PLAY AGAIN (SAME BET) ← §r§a§kM"));
 
         p.openInventory(res);
 
