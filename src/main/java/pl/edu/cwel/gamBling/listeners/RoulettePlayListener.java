@@ -12,6 +12,7 @@ import org.bukkit.inventory.meta.ItemMeta;
 import pl.edu.cwel.gamBling.GamBling;
 
 import java.util.Arrays;
+import java.util.Objects;
 import java.util.Random;
 
 import static pl.edu.cwel.gamBling.commands.Roulette.betInv;
@@ -32,8 +33,8 @@ public class RoulettePlayListener implements Listener {
         Player p = (Player) e.getWhoClicked();
         if((e.getView().getTitle().equals("Roulette") && (e.getSlot() != 20 && e.getClickedInventory() != p.getInventory()))
         || e.getView().getTitle().equals("Rolling...")
-        || e.getView().getTitle().equals("You won!")
-        || e.getView().getTitle().equals("You lost!"))
+        || e.getView().getTitle().equals("You won! - Roulette")
+        || e.getView().getTitle().equals("You lost! - Roulette"))
             e.setCancelled(true);
 
         if (e.getView().getTitle().equals("Roulette") && e.getSlot() == 15 && e.getClickedInventory() != p.getInventory()) {
@@ -111,6 +112,11 @@ public class RoulettePlayListener implements Listener {
             }
 
         }
+
+        if(e.getView().getTitle().contains("! - Roulette") && Objects.requireNonNull(e.getView().getItem(40)).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40){
+            p.performCommand("roulette");
+        }
+
     }
 
     public void Results(Player p){
@@ -119,7 +125,7 @@ public class RoulettePlayListener implements Listener {
         ItemMeta resultMeta = bet.getItemMeta();
 
         Inventory res;
-        res = Bukkit.createInventory(null, 45, "You lost!");
+        res = Bukkit.createInventory(null, 45, "You lost! - Roulette");
 
         if((betInv.getItem(24).getItemMeta().getDisplayName().contains("§8§lBLACK") && inv.getItem(49).getType() == Material.BLACK_CONCRETE)
             || (betInv.getItem(24).getItemMeta().getDisplayName().contains("§4§lRED") && inv.getItem(49).getType() == Material.RED_CONCRETE)) {
@@ -136,7 +142,7 @@ public class RoulettePlayListener implements Listener {
 
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
 
-            res = Bukkit.createInventory(null, 45, "You won!");
+            res = Bukkit.createInventory(null, 45, "You won! - Roulette");
 
         } else if (inv.getItem(49).getAmount() == betInv.getItem(24).getAmount() && betInv.getItem(24).getType() != Material.GREEN_CONCRETE) {
             for(int i = 0; i < 20; i++){
@@ -146,7 +152,7 @@ public class RoulettePlayListener implements Listener {
 
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
 
-            res = Bukkit.createInventory(null, 45, "You won!");
+            res = Bukkit.createInventory(null, 45, "You won! - Roulette");
         }
         if (inv.getItem(49).getType() == Material.GREEN_CONCRETE && inv.getItem(24).getType() == Material.GREEN_CONCRETE) {
             for(int i = 0; i < 10; i++){
@@ -156,7 +162,7 @@ public class RoulettePlayListener implements Listener {
 
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
 
-            res = Bukkit.createInventory(null, 45, "You won!");
+            res = Bukkit.createInventory(null, 45, "You won! - Roulette");
         }
 
         for(int i = 0; i < 45; i++){
@@ -180,6 +186,8 @@ public class RoulettePlayListener implements Listener {
 
         res.setItem(22, inv.getItem(49));
         res.getItem(22).setItemMeta(resultMeta);
+
+        res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
 
         p.openInventory(res);
     }

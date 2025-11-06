@@ -44,9 +44,9 @@ public class BlackjackListener implements Listener {
         if((e.getView().getTitle().equals("Blackjack"))
         || (e.getView().getTitle().equals("Blackjack - Bet")
         && e.getSlot() != 20 && e.getClickedInventory() != p.getInventory())
-        || e.getView().getTitle().equals("You won!")
-        || e.getView().getTitle().equals("You drew!")
-        || e.getView().getTitle().equals("You lost!"))
+        || e.getView().getTitle().equals("You won! - Blackjack")
+        || e.getView().getTitle().equals("You drew! - Blackjack")
+        || e.getView().getTitle().equals("You lost! - Blackjack"))
             e.setCancelled(true);
 
         if(e.getView().getTitle().equals("Blackjack - Bet") && Objects.requireNonNull(e.getView().getItem(22)).getType() == Material.DIAMOND_SWORD && e.getSlot() == 22
@@ -84,7 +84,12 @@ public class BlackjackListener implements Listener {
         if(e.getView().getTitle().equals("Blackjack") && Objects.requireNonNull(e.getView().getItem(40)).getType() == Material.SHIELD && e.getSlot() == 40 && !cooldown){
             cooldown = true;
             DealerRound(p);
-            if(dealerScore < 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 30L);
+            if(dealerScore < 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 50L);
+        }
+
+        //play again
+        if(e.getView().getTitle().contains("! - Blackjack") && Objects.requireNonNull(e.getView().getItem(40)).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40){
+            p.performCommand("blackjack");
         }
 
     }
@@ -110,7 +115,7 @@ public class BlackjackListener implements Listener {
 
         inv.setItem(slot, drawnCard);
 
-        if (score >= 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 30L);
+        if (score >= 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 50L);
     }
 
     public void DealerRound(Player p){
@@ -142,7 +147,7 @@ public class BlackjackListener implements Listener {
             if(round > 2) Results(p, score, dealerScore);
         }
 
-        if (dealerScore >= 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 30L);
+        if (dealerScore >= 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 50L);
     }
 
     public List<ItemStack> Deck(){
@@ -158,7 +163,7 @@ public class BlackjackListener implements Listener {
             String cardColor = "";
 
             if(i % 4 == 0){
-                cardColor = "§f§l";
+                cardColor = "§8§l";
                 meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.RHOMBUS));
                 meta.addPattern(new Pattern(DyeColor.WHITE, PatternType.TRIANGLE_BOTTOM));
                 meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.STRAIGHT_CROSS));
@@ -169,7 +174,7 @@ public class BlackjackListener implements Listener {
                 cardValue += 1;
             }
             if(i % 4 == 1){
-                cardColor = "§f§l";
+                cardColor = "§8§l";
                 is = new ItemStack(Material.BLACK_BANNER);
                 meta.addPattern(new Pattern(DyeColor.WHITE, PatternType.CURLY_BORDER));
                 meta.addPattern(new Pattern(DyeColor.WHITE, PatternType.CREEPER));
@@ -193,7 +198,7 @@ public class BlackjackListener implements Listener {
 
             if(cardValue <= 10) {
                 is.setAmount(cardValue);
-                meta.setDisplayName(String.valueOf(cardValue));
+                meta.setDisplayName(cardColor + cardValue);
             } else {
                 is.setAmount(10);
                 switch (cardValue){
@@ -235,7 +240,7 @@ public class BlackjackListener implements Listener {
         Collections.shuffle(deck);
 
         Inventory res;
-        res = Bukkit.createInventory(null, 45, "You lost!");
+        res = Bukkit.createInventory(null, 45, "You lost! - Blackjack");
 
         ItemStack bet = bjBetInv.getItem(20);
         ItemMeta resultMeta = bet.getItemMeta();
@@ -243,14 +248,14 @@ public class BlackjackListener implements Listener {
         resultMeta.setDisplayName("§r§cYou lost!");
 
         if(scoreResult == dealerScoreResult){
-            res = Bukkit.createInventory(null, 45, "You drew!");
+            res = Bukkit.createInventory(null, 45, "You drew! - Blackjack");
 
             p.getInventory().addItem(bet);
 
             resultMeta.setDisplayName("§r§lYou got returned: §r§7" + bet.getAmount() + "§8x §r§7" + bet.getType());
 
         } else if(scoreResult == 21 || dealerScoreResult > 21 || (scoreResult > dealerScoreResult && scoreResult <= 21)){
-            res = Bukkit.createInventory(null, 45, "You won!");
+            res = Bukkit.createInventory(null, 45, "You won! - Blackjack");
 
             p.getInventory().addItem(bet);
             p.getInventory().addItem(bet);
@@ -281,6 +286,8 @@ public class BlackjackListener implements Listener {
 
         bet.setItemMeta(resultMeta);
         res.setItem(22, bet);
+
+        res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
 
         p.openInventory(res);
 

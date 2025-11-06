@@ -31,11 +31,11 @@ public class SlotsPlayListener implements Listener {
         Player p = (Player) e.getWhoClicked();
         if((e.getView().getTitle().equals("Slots"))
         || e.getView().getTitle().equals("Rolling...")
-        || e.getView().getTitle().equals("You won!")
-        || e.getView().getTitle().equals("You lost!"))
+        || e.getView().getTitle().equals("You won! - Slots")
+        || e.getView().getTitle().equals("You lost! - Slots"))
             e.setCancelled(true);
 
-        if ((e.getView().getTitle().equals("Slots") && e.getSlot() == 22) || (e.getView().getItem(40).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40)) {
+        if ((e.getView().getTitle().equals("Slots") && e.getSlot() == 22) || (e.getView().getTitle().contains("! - Slots") && e.getView().getItem(40).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40)) {
 
             p.openInventory(inv);
 
@@ -117,10 +117,10 @@ public class SlotsPlayListener implements Listener {
     public void Results(Player p){
 
         Inventory res;
-        res = Bukkit.createInventory(null, 45, "You lost!");
+        res = Bukkit.createInventory(null, 45, "You lost! - Slots");
 
         if(inv.getItem(21).getType() == inv.getItem(22).getType() && inv.getItem(22).getType() == inv.getItem(23).getType()){
-            res = Bukkit.createInventory(null, 45, "You won!");
+            res = Bukkit.createInventory(null, 45, "You won! - Slots");
         }
 
         for(int i = 0; i < 45; i++){

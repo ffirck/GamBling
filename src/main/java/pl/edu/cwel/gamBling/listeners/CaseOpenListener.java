@@ -72,13 +72,18 @@ public class CaseOpenListener implements Listener {
             }
 
         }
+
+        if(e.getView().getTitle().equals("Results") && e.getSlot() == 40 && e.getView().getItem(40).getType() == Material.MUSIC_DISC_CAT){
+            p.performCommand("opencase");
+        }
+
     }
 
     public void OpeningResults(Player p){
         Inventory res = Bukkit.createInventory(null, 45, "Results");
 
         for(int i = 0; i < 45; i++){
-            res.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " ", ""));
+            res.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
         //
@@ -88,15 +93,17 @@ public class CaseOpenListener implements Listener {
         //
 
         for(int i = 12; i < 15; i++){
-            res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
+            res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
-        res.setItem(21, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
-        res.setItem(23, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
+        res.setItem(21, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
+        res.setItem(23, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         for(int i = 30; i < 33; i++){
-            res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
+            res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
-        res.setItem(22, itemStack(caseRarityMats.get(55), caseRarityNames.get(55), ""));
+        res.setItem(22, itemStack(caseRarityMats.get(55), caseRarityNames.get(55)));
+
+        res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
 
         p.openInventory(res);
     }
@@ -167,14 +174,14 @@ public class CaseOpenListener implements Listener {
 
     public void initializeItems(int offset) throws MalformedURLException {
         for(int i = 0; i < 45; i++){
-            inv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " ", ""));
+            inv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
         for(int i = 9; i < 36; i++){
-            inv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
+            inv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
-        inv.setItem(13, itemStack(Material.POINTED_DRIPSTONE, "↓", ""));
+        inv.setItem(13, itemStack(Material.POINTED_DRIPSTONE, "↓"));
 
         ItemStack skip = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skipMeta = (SkullMeta) skip.getItemMeta();
@@ -189,21 +196,18 @@ public class CaseOpenListener implements Listener {
         inv.setItem(44, skip);
 
         for(int i = 18; i < 27; i++){
-            inv.setItem(i, itemStack(caseRarityMats.get(i - 18 + offset), caseRarityNames.get(i - 18 + offset), ""));
+            inv.setItem(i, itemStack(caseRarityMats.get(i - 18 + offset), caseRarityNames.get(i - 18 + offset)));
         }
 
     }
 
-    ItemStack itemStack(Material mat, String name, String lore){
+    ItemStack itemStack(Material mat, String name){
         if (mat == null){ mat = Material.AIR; }
         ItemStack item = new ItemStack(mat, 1);
         ItemMeta meta = item.getItemMeta();
 
         if(meta != null) {
             meta.setDisplayName(name);
-            if(!lore.isEmpty()){
-                meta.setLore(Arrays.asList(lore));
-            }
             item.setItemMeta(meta);
         }
 
