@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Objects;
 import java.util.Random;
 
+import static pl.edu.cwel.gamBling.GamBling.getNameFromKey;
 import static pl.edu.cwel.gamBling.commands.Roulette.betInv;
 
 public class RoulettePlayListener implements Listener {
@@ -141,6 +142,7 @@ public class RoulettePlayListener implements Listener {
             }
 
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
+            p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
 
             res = Bukkit.createInventory(null, 45, "You won! - Roulette");
 
@@ -151,18 +153,21 @@ public class RoulettePlayListener implements Listener {
             int amt = 20 * bet.getAmount();
 
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
+            p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
 
             res = Bukkit.createInventory(null, 45, "You won! - Roulette");
-        }
-        if (inv.getItem(49).getType() == Material.GREEN_CONCRETE && inv.getItem(24).getType() == Material.GREEN_CONCRETE) {
+        } else if (inv.getItem(49).getType() == Material.GREEN_CONCRETE && inv.getItem(24).getType() == Material.GREEN_CONCRETE) {
             for(int i = 0; i < 10; i++){
                 p.getInventory().addItem(bet);
             }
             int amt = 10 * bet.getAmount();
 
             resultMeta.setDisplayName("§r§lYou won: §r§7" + amt + "§8x §r§7" + bet.getType());
+            p.sendMessage("§a§lWIN! §rYou got " + amt + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
 
             res = Bukkit.createInventory(null, 45, "You won! - Roulette");
+        } else {
+            p.sendMessage("§c§lLOSS! §rYou lost " + bet.getAmount() + "§7x §r§b" + getNameFromKey(bet.getTranslationKey()) + "§r!");
         }
 
         for(int i = 0; i < 45; i++){
