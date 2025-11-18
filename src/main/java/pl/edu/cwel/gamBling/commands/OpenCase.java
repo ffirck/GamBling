@@ -29,6 +29,7 @@ public class OpenCase implements CommandExecutor {
 
     private Inventory inv;
 
+    // the clickable item that starts the game
     public static ItemStack getOpenItem(){
         ItemStack item = new ItemStack(Material.ENDER_CHEST, 1);
         ItemMeta meta = item.getItemMeta();
@@ -38,18 +39,19 @@ public class OpenCase implements CommandExecutor {
         return item;
     }
 
+    // GUI
     public void initializeItems(){
 
         for(int i = 0; i < 45; i++){
             inv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " ", ""));
         }
 
+        // black stained glass panes
         //
         //   ###
         //   # #
         //   ###
         //
-
         for(int i = 12; i < 15; i++){
             inv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
         }
@@ -59,6 +61,8 @@ public class OpenCase implements CommandExecutor {
             inv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
         }
 
+        // the clickable item that starts the game is set to a previously
+        // established itemstack
         inv.setItem(22, getOpenItem());
     }
 

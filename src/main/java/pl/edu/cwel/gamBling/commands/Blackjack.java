@@ -27,18 +27,20 @@ public class Blackjack implements CommandExecutor {
 
     public static Inventory bjBetInv;
 
+
+    // bet GUI
     public void initializeItems(){
 
         for(int i = 0; i < 45; i++){
             bjBetInv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
+        // black stained glass panes
         //
         //   ###
         //   # #
         //   ###
         //
-
         for(int i = 12; i < 15; i++){
             bjBetInv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
@@ -48,7 +50,10 @@ public class Blackjack implements CommandExecutor {
             bjBetInv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
+        // bet slot
         bjBetInv.setItem(20, new ItemStack(Material.AIR));
+
+        // the item that starts the game after being clicked
         bjBetInv.setItem(22, itemStack(Material.DIAMOND_SWORD, "§a§kM §r§a§l→ PLAY ← §r§a§kM"));
 
     }

@@ -27,6 +27,7 @@ public class Slots implements CommandExecutor {
 
     private Inventory inv;
 
+    // the item that starts the game
     public static ItemStack getOpenItem(){
         ItemStack item = new ItemStack(Material.GOLDEN_CARROT, 7);
         ItemMeta meta = item.getItemMeta();
@@ -42,12 +43,12 @@ public class Slots implements CommandExecutor {
             inv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
+        // black pane pattern
         //
         //   ###
         //   # #
         //   ###
         //
-
         for(int i = 12; i < 15; i++){
             inv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
@@ -57,6 +58,7 @@ public class Slots implements CommandExecutor {
             inv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
+        // start item
         inv.setItem(22, getOpenItem());
     }
 

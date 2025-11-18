@@ -49,18 +49,19 @@ public class Roulette implements CommandExecutor {
         return item;
     }
 
+    // bet GUI
     public void initializeItems() throws MalformedURLException {
 
         for(int i = 0; i < 45; i++){
             betInv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " ", ""));
         }
 
+        // black stained glass panes pattern
         //
         //   ###
         //   # #
         //   ###
         //
-
         for(int i = 12; i < 15; i++){
             betInv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
         }
@@ -70,8 +71,10 @@ public class Roulette implements CommandExecutor {
             betInv.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " ", ""));
         }
 
+        // bet slot
         betInv.setItem(20, new ItemStack(Material.AIR));
 
+        // change bet color/number item (next)
         ItemStack upArrow = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta upArrowMeta = (SkullMeta) upArrow.getItemMeta();
         PlayerProfile profileUp = Bukkit.createPlayerProfile(UUID.randomUUID(), "");
@@ -82,6 +85,7 @@ public class Roulette implements CommandExecutor {
         upArrowMeta.setDisplayName("§r§aNEXT");
         upArrow.setItemMeta(upArrowMeta);
 
+        // change bet color/number item (previous)
         ItemStack downArrow = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta downArrowMeta = (SkullMeta) downArrow.getItemMeta();
         PlayerProfile profileDown = Bukkit.createPlayerProfile(UUID.randomUUID(), "");
@@ -96,6 +100,7 @@ public class Roulette implements CommandExecutor {
         betInv.setItem(24, itemStack(Material.GREEN_CONCRETE, "§rBET§7: §2§lGREEN", "§r§8Payout: §710§8x"));
         betInv.setItem(33, downArrow);
 
+        // the item that starts the game after being clicked
         betInv.setItem(22, getPlayItem());
     }
 

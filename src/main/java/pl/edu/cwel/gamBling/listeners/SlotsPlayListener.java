@@ -28,6 +28,8 @@ public class SlotsPlayListener implements Listener {
 
     @EventHandler
     public void OnPlaySlots(InventoryClickEvent e){
+
+        // correct inventory checker
         Player p = (Player) e.getWhoClicked();
         if((e.getView().getTitle().equals("Slots"))
         || e.getView().getTitle().equals("Rolling...")
@@ -35,6 +37,7 @@ public class SlotsPlayListener implements Listener {
         || e.getView().getTitle().equals("You lost! - Slots"))
             e.setCancelled(true);
 
+        // clicking play
         if ((e.getView().getTitle().equals("Slots") && e.getSlot() == 22) || (e.getView().getTitle().contains("! - Slots") && e.getView().getItem(40).getType() == Material.MUSIC_DISC_CAT && e.getSlot() == 40)) {
 
             p.openInventory(inv);
@@ -43,25 +46,33 @@ public class SlotsPlayListener implements Listener {
 
             InitializeItems();
 
+            // all the rolled items are stored in a singular hashmap,
+            // then they are divided into 3 columns consisting of 50 items
+            // (only 45 of them get shown i think, but 50 is just more
+            // convenient)
             RollColumn1(0);
             RollColumn2(50);
             RollColumn3(100);
 
+            // game ends after 7.5 secs
             Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
                     Results(p), 150L);
 
+            // first column starts rolling
             for(int i = 0; i < 40; i++){
                 int shiftAmount = i;
                 Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
                         RollColumn1(shiftAmount), 2L*i);
             }
 
+            // second column starts rolling
             for(int i = 50; i < 90; i++){
                 int shiftAmount = i;
                 Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
                         RollColumn2(shiftAmount), 2L*i - 80);
             }
 
+            // third column starts rolling
             for(int i = 100; i < 140; i++){
                 int shiftAmount = i;
                 Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
@@ -77,10 +88,13 @@ public class SlotsPlayListener implements Listener {
     public void Roll(){
 
         for(int i = 0; i < 150; i++) {
+            // random item type
             int random = new Random().nextInt(0, 7);
 
             ItemStack rolledItem;
 
+            // the item's material and display name get set based
+            // on its rolled type
             switch(random){
                 case 0:
                     rolledItem = itemStack(Material.GOLDEN_CARROT, "§r§e§l7", 7);
@@ -114,9 +128,13 @@ public class SlotsPlayListener implements Listener {
 
     }
 
+    // result GUI
     public void Results(Player p){
 
         Inventory res;
+
+        // lose by default, overridden if you win
+        // (all 3 rolled items are the same)
         res = Bukkit.createInventory(null, 45, "You lost! - Slots");
 
         if(inv.getItem(21).getType() == inv.getItem(22).getType() && inv.getItem(22).getType() == inv.getItem(23).getType()){
@@ -127,12 +145,12 @@ public class SlotsPlayListener implements Listener {
             res.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
+        // black pane pattern
         //
         //  #####
         //  #   #
         //  #####
         //
-
         for(int i = 11; i < 16; i++){
             res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
@@ -142,6 +160,8 @@ public class SlotsPlayListener implements Listener {
             res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
+        // the 3 rolled items (the ones in
+        // the middle of each column)
         for(int i = 21; i < 24; i++) res.setItem(i, inv.getItem(i));
 
         res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
@@ -150,6 +170,7 @@ public class SlotsPlayListener implements Listener {
 
     }
 
+    // rolling GUI
     public void InitializeItems(){
 
         for(int i = 0; i < 45; i++){

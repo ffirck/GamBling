@@ -38,6 +38,8 @@ public class CaseOpenListener implements Listener {
 
     @EventHandler
     public void OnOpenCase(InventoryClickEvent e){
+
+        // correct inventory checker
         Player p = (Player) e.getWhoClicked();
         if(e.getView().getTitle().equals("Case")
         || e.getView().getTitle().equals("Opening...")
@@ -45,19 +47,27 @@ public class CaseOpenListener implements Listener {
         && (e.getSlot() != 22)))
             e.setCancelled(true);
 
+        // clicking skip
         if (e.getView().getTitle().equals("Opening...") && e.getSlot() == 44) {
             Bukkit.getScheduler().cancelTasks(main);
             OpeningResults(p);
         }
 
+        // starting the game
         if (e.getView().getTitle().equals("Case") && e.getSlot() == 22) {
 
             RollItems();
             p.openInventory(inv);
 
+            // the results get displayed in 15.5 secs
             Bukkit.getScheduler().scheduleSyncDelayedTask(main, () ->
                     OpeningResults(p), (310L));
 
+
+            // opening animation + functionality
+            //
+            // the formula for each tick is i^2 / 10 gameticks so it gets
+            // slower over time
             for(int i = 1; i < 52; i++) {
                 int offset = i;
 
@@ -73,6 +83,7 @@ public class CaseOpenListener implements Listener {
 
         }
 
+        // play again
         if(e.getView().getTitle().equals("Results") && e.getSlot() == 40 && e.getView().getItem(40).getType() == Material.MUSIC_DISC_CAT){
             p.performCommand("opencase");
         }
@@ -86,12 +97,12 @@ public class CaseOpenListener implements Listener {
             res.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
+        // black pane pattern
         //
         //   ###
         //   # #
         //   ###
         //
-
         for(int i = 12; i < 15; i++){
             res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
@@ -101,8 +112,10 @@ public class CaseOpenListener implements Listener {
             res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
 
+        // the resulting item
         res.setItem(22, itemStack(caseRarityMats.get(55), caseRarityNames.get(55)));
 
+        // play again
         res.setItem(40, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
 
         p.openInventory(res);
@@ -131,6 +144,7 @@ public class CaseOpenListener implements Listener {
             if(random <= 949 && random > 824) rarity = 2; // rare chance 12.5%
             if(random <= 824 && random > 599) rarity = 1; // uncommon chance 22.5%
 
+            // changing the color and name based on the rarity
             Material rarityMaterial;
             String rarityName = switch (rarity) {
                 case 0 -> {
@@ -172,6 +186,7 @@ public class CaseOpenListener implements Listener {
         }
     }
 
+    // opening GUI
     public void initializeItems(int offset) throws MalformedURLException {
         for(int i = 0; i < 45; i++){
             inv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
@@ -183,6 +198,7 @@ public class CaseOpenListener implements Listener {
 
         inv.setItem(13, itemStack(Material.POINTED_DRIPSTONE, "↓"));
 
+        // skip item
         ItemStack skip = new ItemStack(Material.PLAYER_HEAD);
         SkullMeta skipMeta = (SkullMeta) skip.getItemMeta();
         PlayerProfile profile = Bukkit.createPlayerProfile(UUID.randomUUID(), "");
@@ -195,6 +211,7 @@ public class CaseOpenListener implements Listener {
 
         inv.setItem(44, skip);
 
+        // displaying the items that are rolling
         for(int i = 18; i < 27; i++){
             inv.setItem(i, itemStack(caseRarityMats.get(i - 18 + offset), caseRarityNames.get(i - 18 + offset)));
         }

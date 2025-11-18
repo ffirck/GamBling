@@ -43,6 +43,8 @@ public class BlackjackListener implements Listener {
 
     @EventHandler
     public void OnClick(InventoryClickEvent e){
+
+        // correct inventory check
         Player p = (Player) e.getWhoClicked();
         if((e.getView().getTitle().equals("Blackjack"))
         || (e.getView().getTitle().equals("Blackjack - Bet")
@@ -52,6 +54,7 @@ public class BlackjackListener implements Listener {
         || e.getView().getTitle().equals("You lost! - Blackjack"))
             e.setCancelled(true);
 
+        // after clicking the item that starts the game
         if(e.getView().getTitle().equals("Blackjack - Bet") && Objects.requireNonNull(e.getView().getItem(22)).getType() == Material.DIAMOND_SWORD && e.getSlot() == 22
                 && Objects.requireNonNull(e.getView().getItem(20)).getType() != Material.AIR){
             bet = bjBetInv.getItem(20);
@@ -119,6 +122,8 @@ public class BlackjackListener implements Listener {
 
         deck.removeFirst();
 
+        // putting the item in the correct place (because the card gui
+        // is 2x4
         int slot = switch (round) {
             case 1 -> 9;
             case 2 -> 10;
@@ -133,6 +138,7 @@ public class BlackjackListener implements Listener {
 
         inv.setItem(slot, drawnCard);
 
+        // game end (player's score at or over 21)
         if (score >= 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 50L);
     }
 
@@ -140,6 +146,19 @@ public class BlackjackListener implements Listener {
 
         cooldown = false;
 
+        // the dealer will hit if:
+        //
+        // the player's score is at or above 15,
+        // AND the dealer's score is less than 15
+        // OR it hits a random 50% chance
+        // AND the dealer's score is less than 17
+        //
+        // OR
+        //
+        // the player's score is bigger than the dealer's
+        // AND the dealer's score is less than 17
+        //
+        // otherwise it will stand
         if((((score >= 15 && dealerScore < 15) || new Random().nextInt(2) > 0) && dealerScore < 17) || (score > dealerScore && dealerScore < 17)) {
 
             ItemStack drawnCard = deck.getFirst();
@@ -148,6 +167,7 @@ public class BlackjackListener implements Listener {
 
             deck.removeFirst();
 
+            // correct slot
             int slot = switch (dealerRound) {
                 case 1 -> 16;
                 case 2 -> 17;
@@ -165,9 +185,11 @@ public class BlackjackListener implements Listener {
             if(round > 2) Results(p, score, dealerScore);
         }
 
+        // game end (dealer's score at or over 21)
         if (dealerScore >= 21) Bukkit.getScheduler().scheduleSyncDelayedTask(main, () -> Results(p, score, dealerScore), 50L);
     }
 
+    // list of 52 items (the deck)
     public List<ItemStack> Deck(){
 
         List<ItemStack> deck = new ArrayList<>();
@@ -180,6 +202,7 @@ public class BlackjackListener implements Listener {
 
             String cardColor = "";
 
+            // spades
             if(i % 4 == 0){
                 cardColor = "§8§l";
                 meta.addPattern(new Pattern(DyeColor.BLACK, PatternType.RHOMBUS));
@@ -191,6 +214,8 @@ public class BlackjackListener implements Listener {
 
                 cardValue += 1;
             }
+
+            // clubs
             if(i % 4 == 1){
                 cardColor = "§8§l";
                 is = new ItemStack(Material.BLACK_BANNER);
@@ -202,11 +227,15 @@ public class BlackjackListener implements Listener {
                 meta.addPattern(new Pattern(DyeColor.WHITE, PatternType.BORDER));
                 is.setItemMeta(meta);
             }
+
+            // diamonds
             if(i % 4 == 2){
                 cardColor = "§c§l";
                 meta.addPattern(new Pattern(DyeColor.RED, PatternType.RHOMBUS));
                 is.setItemMeta(meta);
             }
+
+            // hearts
             if(i % 4 == 3){
                 cardColor = "§c§l";
                 meta.addPattern(new Pattern(DyeColor.RED, PatternType.RHOMBUS));
@@ -218,18 +247,23 @@ public class BlackjackListener implements Listener {
                 is.setAmount(cardValue);
                 meta.setDisplayName(cardColor + cardValue);
             } else {
+                // handling cards over 10
                 is.setAmount(10);
                 switch (cardValue){
                     case 11:
+                        // jack
                         meta.setDisplayName(cardColor + "J");
                         break;
                     case 12:
+                        // queen
                         meta.setDisplayName(cardColor + "Q");
                         break;
                     case 13:
+                        // king
                         meta.setDisplayName(cardColor + "K");
                         break;
                     case 14:
+                        // ace
                         is.setAmount(11);
                         meta.setDisplayName(cardColor + "A");
                         break;
@@ -257,6 +291,7 @@ public class BlackjackListener implements Listener {
         deck = Deck();
         Collections.shuffle(deck);
 
+        // you lose by default, it gets overridden if you win or tie
         Inventory res;
         res = Bukkit.createInventory(null, 45, "You lost! - Blackjack");
 
@@ -266,6 +301,7 @@ public class BlackjackListener implements Listener {
         String resultName = getNameFromKey(result.getTranslationKey());
 
         if(scoreResult == dealerScoreResult){
+            // tie
             res = Bukkit.createInventory(null, 45, "You drew! - Blackjack");
 
             p.sendMessage("§b§lDRAW! §rYou got returned: " + bet.getAmount() + "§7x §r§b" + resultName + "§r!");
@@ -274,6 +310,15 @@ public class BlackjackListener implements Listener {
             resultMeta.setDisplayName("§r§lYou got returned §r§7" + bet.getAmount() + "§8x §r§7" + resultName);
 
         } else if(scoreResult == 21 || dealerScoreResult > 21 || (scoreResult > dealerScoreResult && scoreResult <= 21)){
+            // win if:
+            // the player's score is 21,
+            // OR the dealer's score is over 21,
+            //
+            // OR
+            //
+            // the player's score is bigger than the dealer's,
+            // AND if the player's score is less or equal to 21
+            // (in case the game ends by standing)
             res = Bukkit.createInventory(null, 45, "You won! - Blackjack");
 
             p.getInventory().addItem(bet);
@@ -287,16 +332,17 @@ public class BlackjackListener implements Listener {
             p.sendMessage("§c§lLOSS! §rYou lost " + bet.getAmount() + "§7x §r§b" + resultName + "§r!");
         }
 
+        // results GUI
         for(int i = 0; i < 45; i++){
             res.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
         }
 
+        // black pane pattern
         //
         //   ###
         //   # #
         //   ###
         //
-
         for(int i = 12; i < 15; i++){
             res.setItem(i, itemStack(Material.BLACK_STAINED_GLASS_PANE, " "));
         }
@@ -309,6 +355,7 @@ public class BlackjackListener implements Listener {
         result.setItemMeta(resultMeta);
         res.setItem(22, result);
 
+        // play again, play again same bet
         res.setItem(39, itemStack(Material.MUSIC_DISC_CAT, "§a§kM §r§a§l→ PLAY AGAIN ← §r§a§kM"));
         res.setItem(41, itemStack(Material.MUSIC_DISC_CHIRP, "§c§kM §r§c§l→ PLAY AGAIN (SAME BET) ← §r§c§kM"));
 
@@ -316,6 +363,7 @@ public class BlackjackListener implements Listener {
 
     }
 
+    // game GUI
     public void InitializeItems(){
         for(int i = 0; i < 54; i++){
             inv.setItem(i, itemStack(Material.GRAY_STAINED_GLASS_PANE, " "));
